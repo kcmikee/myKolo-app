@@ -1,21 +1,56 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
+import MyKoloApp from './navigation/myKoloNav'
 
-export default function App() {
+
+export default class App extends React.Component {
+    state = {
+        appIsReady: false,
+      };
+    
+      async componentDidMount() {
+        // Prevent native splash screen from autohiding
+        try {
+          await SplashScreen.preventAutoHideAsync();
+        } catch (e) {
+          console.warn(e);
+        }
+        this.prepareResources();
+      }
+    
+      /**
+       * Method that serves to load resources and make API calls
+       */
+      prepareResources = async () => {
+        try {
+          await performAPICalls();
+          await downloadAssets();
+        } catch (e) {
+          console.warn(e);
+        } finally {
+          this.setState({ appIsReady: true }, async () => {
+            await SplashScreen.hideAsync();
+          });
+        }
+      };
+    
+      render() {
+        if (!this.state.appIsReady) {
+          return null;
+        }
+      
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <MyKoloApp />
   );
 }
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+// });
